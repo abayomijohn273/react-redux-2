@@ -1,38 +1,57 @@
-import React from 'react';
+import React, {useState, useLayoutEffect, useEffect, useReducer, useContext} from 'react';
 import "bootstrap/dist/css/bootstrap.min.css"
-import './App.css';
-import User from "./containers/User"
-import MessagesList from "./containers/MessagesList"
-import AddMessage from "./containers/AddMessage"
+import "./style.css"
+import AddPost from './components/AddPost';
+import { FETCH_POST, ADD_POST, DELETE_POST, EDIT_POST } from './constant';
+import Posts from './components/Posts';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="text-center py-3">
-        <h3>Bayo ChatApp</h3>
-      </header>
-      <main className="mt-4">
-        <section>
-          <div className="container">
-            <div className="row">
-              <div className="col-md-6 users">
-                <User/>
-              </div>
-              <div className="col-md-6" id="message-list">
-                <MessagesList/>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-7 fixed-bottom" id="new-messages">
-                    <AddMessage/>
-              </div>
-            </div>
-            
-          </div>
-        </section>
-      </main>
-    </div>
-  );
+const initialState = {
+  posts: [],
+  post: {},
+  editPost: false
 }
 
-export default App;
+const reducer = (state, action) => {
+  switch(action.type){
+    case FETCH_POST : 
+      return {
+        ...state,
+        posts: action.payload
+      }
+      break;
+    case ADD_POST:
+      return{
+        ...state,
+        posts: action.payload,
+        editPost: false
+      }
+      case DELETE_POST: 
+        return {
+          ...state, 
+          posts: action.payload
+        }
+      case EDIT_POST:
+        return{
+          ...state,
+          post: action.payload,
+          editPost: true
+        }
+    default:
+      return state
+  }
+}
+
+
+export const MyPost = React.createContext()
+const App = (props) => {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  return(
+    <>
+    <MyPost.Provider value={{state, dispatch}}>
+      <AddPost/>
+      <Posts/>
+    </MyPost.Provider>
+    </>
+  )
+}
+export default App
